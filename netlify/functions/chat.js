@@ -1,6 +1,8 @@
 import fetch from "node-fetch";
 
 export async function handler(event, context) {
+  console.log("OPENROUTER_KEY:", process.env.OPENROUTER_KEY?.slice(0,5) + "...");
+
   try {
     const { message } = JSON.parse(event.body);
 
@@ -17,14 +19,9 @@ export async function handler(event, context) {
     });
 
     const data = await response.json();
-    return {
-      statusCode: 200,
-      body: JSON.stringify(data)
-    };
+    return { statusCode: 200, body: JSON.stringify(data) };
   } catch (err) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message })
-    };
+    console.error(err);
+    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
   }
 }
