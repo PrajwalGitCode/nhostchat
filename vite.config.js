@@ -8,5 +8,5 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  base: './', // <-- ADD THIS LINE
+  base: '/', // <-- FIXED FOR NETLIFY
 })
