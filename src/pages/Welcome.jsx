@@ -62,8 +62,8 @@ export default function Welcome() {
     setLoading(true);
 
     try {
-      // Call Netlify function instead of OpenRouter directly
-      const response = await fetch("/.netlify/functions/chat", {
+      // Call Netlify openrouter function
+      const response = await fetch("/.netlify/functions/openrouter", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
