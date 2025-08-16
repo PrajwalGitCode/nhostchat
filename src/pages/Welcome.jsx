@@ -62,16 +62,14 @@ export default function Welcome() {
     setLoading(true);
 
     try {
-      // OpenRouter GPT call
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      // Call Netlify function instead of OpenRouter directly
+      const response = await fetch("/.netlify/functions/chat", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${OPENROUTER_KEY}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "openai/gpt-3.5-turbo",
-          messages: [
+          message: [
             { role: "system", content: "You are a helpful AI assistant." },
             ...updatedChats[chatIdx].messages.map(m => ({
               role: m.sender === "user" ? "user" : "assistant",
@@ -82,6 +80,7 @@ export default function Welcome() {
       });
 
       const data = await response.json();
+      // Adapt to OpenRouter function response
       const botReply = data.choices?.[0]?.message?.content || "Sorry, I could not get a response.";
 
       updatedChats[chatIdx].messages.push({ id: crypto.randomUUID(), sender: "bot", text: botReply });
