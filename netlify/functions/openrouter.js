@@ -2,10 +2,27 @@ import fetch from "node-fetch";
 
 export async function handler(event, context) {
   try {
-    // 1. Parse request
-    const { message } = JSON.parse(event.body);
+    // 1. Parse request safely
+    if (!event.body) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing request body" })
+      };
+    }
 
-    // 2. Check Nhost token from headers
+    let parsed;
+    try {
+      parsed = JSON.parse(event.body);
+    } catch (err) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Invalid JSON body" })
+      };
+    }
+
+    const { message } = parsed;
+
+    // 2. Check Nhost token
     const authHeader = event.headers.authorization;
     if (!authHeader) {
       return {
@@ -13,17 +30,12 @@ export async function handler(event, context) {
         body: JSON.stringify({ error: "Missing Authorization header" })
       };
     }
-
     const nhostToken = authHeader.split(" ")[1];
 
     // 3. Validate token with Nhost
     const nhostResponse = await fetch(
       "https://uroqldkdwwccgvomihii.auth.eu-central-1.nhost.run/v1/users/me",
-      {
-        headers: {
-          "Authorization": `Bearer ${nhostToken}`
-        }
-      }
+      { headers: { Authorization: `Bearer ${nhostToken}` } }
     );
 
     if (!nhostResponse.ok) {
@@ -48,9 +60,15 @@ export async function handler(event, context) {
 
     const data = await response.json();
 
+    // 5. Extract clean reply
+    const reply =
+      data?.choices?.[0]?.message?.content ||
+      data?.choices?.[0]?.text ||
+      "Sorry, no response from AI.";
+
     return {
       statusCode: 200,
-      body: JSON.stringify(data)
+      body: JSON.stringify({ reply }) // only return clean reply
     };
   } catch (err) {
     return {

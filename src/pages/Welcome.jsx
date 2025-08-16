@@ -62,7 +62,6 @@ export default function Welcome() {
     setLoading(true);
 
     try {
-      // Call Netlify openrouter function
       const response = await fetch("/.netlify/functions/openrouter", {
         method: "POST",
         headers: {
@@ -80,18 +79,29 @@ export default function Welcome() {
       });
 
       const data = await response.json();
-      // Adapt to OpenRouter function response
-      const botReply = data.choices?.[0]?.message?.content || "Sorry, I could not get a response.";
 
-      updatedChats[chatIdx].messages.push({ id: crypto.randomUUID(), sender: "bot", text: botReply });
+      // Now it's just data.reply
+      const botReply = data.reply || "Sorry, I could not get a response.";
+
+      updatedChats[chatIdx].messages.push({
+        id: crypto.randomUUID(),
+        sender: "bot",
+        text: botReply
+      });
+
       setChats([...updatedChats]);
     } catch (err) {
-      updatedChats[chatIdx].messages.push({ id: crypto.randomUUID(), sender: "bot", text: "Error contacting AI." });
+      updatedChats[chatIdx].messages.push({
+        id: crypto.randomUUID(),
+        sender: "bot",
+        text: "Error contacting AI."
+      });
       setChats([...updatedChats]);
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleNewChat = () => {
     const newId = crypto.randomUUID();
