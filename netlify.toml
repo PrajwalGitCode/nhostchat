@@ -1,5 +1,8 @@
-# Netlify configuration for React SPA
-# Redirect all requests to index.html for client-side routing
+[build]
+  publish = "dist"               # where vite/react build outputs
+  functions = "netlify/functions"   # folder for serverless functions
+
+# Redirects for SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
